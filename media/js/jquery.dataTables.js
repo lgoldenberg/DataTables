@@ -2808,9 +2808,11 @@
 	
 		return filter[0];
 	}
-	
-	
-	/**
+
+  /* LIRON FIX: timer for filter */
+  var fnFilterTimer = new Date();
+
+  /**
 	 * Filter the table using both the global filter and column based filtering
 	 *  @param {object} oSettings dataTables settings object
 	 *  @param {object} oSearch search information
@@ -2858,10 +2860,29 @@
 		{
 			fnSaveFilter( oInput );
 		}
-	
-		/* Tell the draw function we have been filtering */
-		oSettings.bFiltered = true;
-		_fnCallbackFire( oSettings, null, 'search', [oSettings] );
+
+    /* Tell the draw function we have been filtering */
+
+    /**
+     * LIRON CHANGE
+     */
+
+      //oSettings.bFiltered = true;
+
+      //_fnCallbackFire( oSettings, null, 'search', [oSettings] );
+
+    clearTimeout(fnFilterTimer);
+
+    fnFilterTimer = setTimeout(function() {
+      oSettings.bFiltered = true;
+
+      _fnCallbackFire( oSettings, null, 'search', [oSettings] );
+
+    },500);
+
+    /**
+     * LIRON CHANGE END
+     */
 	}
 	
 	

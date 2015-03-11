@@ -2073,7 +2073,6 @@
 		oSettings.bDrawing = false;
 	}
 	
-	
 	/**
 	 * Redraw the table - taking account of the various features which are enabled
 	 *  @param {object} oSettings dataTables settings object
@@ -2093,7 +2092,7 @@
 		}
 	
 		if ( filter ) {
-			_fnFilterComplete( settings, settings.oPreviousSearch );
+      _fnFilterComplete( settings, settings.oPreviousSearch );
 		}
 		else {
 			// No filtering, so we want to just use the display master
@@ -2809,8 +2808,6 @@
 		return filter[0];
 	}
 
-  /* LIRON FIX: timer for filter */
-  var fnFilterTimer = new Date();
 
   /**
 	 * Filter the table using both the global filter and column based filtering
@@ -2863,26 +2860,10 @@
 
     /* Tell the draw function we have been filtering */
 
-    /**
-     * LIRON CHANGE
-     */
-
-      //oSettings.bFiltered = true;
-
-      //_fnCallbackFire( oSettings, null, 'search', [oSettings] );
-
-    clearTimeout(fnFilterTimer);
-
-    fnFilterTimer = setTimeout(function() {
       oSettings.bFiltered = true;
 
       _fnCallbackFire( oSettings, null, 'search', [oSettings] );
 
-    },500);
-
-    /**
-     * LIRON CHANGE END
-     */
 	}
 	
 	
@@ -7276,14 +7257,22 @@
 	 *   called, which is why the pagination reset is the default action.
 	 * @returns {DataTables.Api} this
 	 */
-	_api_register( 'draw()', function ( resetPaging ) {
+
+  /* LIRON FIX: timer for filter */
+  var fnFilterTimers = {};
+
+  _api_register( 'draw()', function ( resetPaging ) {
 		return this.iterator( 'table', function ( settings ) {
-			_fnReDraw( settings, resetPaging===false );
+      // LIRON FIX START
+      clearTimeout(fnFilterTimers[settings.sTableId]);
+      fnFilterTimers[settings.sTableId] = setTimeout(function() {
+        _fnReDraw( settings, resetPaging===false );
+      },500);
+      // LIRON FIX END
 		} );
 	} );
 	
-	
-	
+		
 	/**
 	 * Get the current page index.
 	 *
